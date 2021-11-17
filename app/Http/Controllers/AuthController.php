@@ -12,7 +12,7 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        // validation params
+        // validasi parameter
         $validator = Validator::make($request->all(),[
             'username' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -22,15 +22,14 @@ class AuthController extends Controller
         if($validator->fails()){
             return response()->json($validator->errors());       
         }
-        // add data to user table
+        // tambah data 
         $user = User::create([
             'name' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password)
          ]);
-         // create token
+         // buat token
         $token = $user->createToken('auth_token')->plainTextToken;
-        // set success response
         $response = [
             'meta' => [
                 'code' => '201',
@@ -46,7 +45,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        // validation email or password is wrong
+        // validasi email
         if (!Auth::attempt($request->only('email', 'password')))
         {
             $response = [
@@ -57,11 +56,11 @@ class AuthController extends Controller
             ];
             return response()->json($response, 401);
         }
-        // get user data
+        // ambil data user
         $user = User::where('email', $request['email'])->firstOrFail();
-        // get token
+        // ambil token
         $token = $user->createToken('auth_token')->plainTextToken;
-        // set success response
+        // respon jika berhasil
         $response = [
             'meta' => [
                 'code' => '200',
@@ -75,9 +74,9 @@ class AuthController extends Controller
 
     public function logout()
     {
-        // delete token
+        // hapus token
         auth()->user()->tokens()->delete();
-        //success response
+        //sukses respon
         $response = [
             'meta' => [
                 'code' => '200',
